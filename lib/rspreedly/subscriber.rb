@@ -27,7 +27,8 @@ module RSpreedly
                   :subscription_plan_name,
                   :token,
                   :updated_at,
-                  :invoices
+                  :invoices,
+                  :transactions
 
     class << self
 
@@ -70,6 +71,12 @@ module RSpreedly
         end
         @invoices << item
       end
+    end
+
+    def transactions
+      response = api_request(:get, "/subscribers/#{customer_id}/transactions.xml")
+      return [] unless response.has_key?("transactions")
+      response["transactions"].collect{|data| Transaction.new(data)}
     end
 
     def new_record?
@@ -204,7 +211,7 @@ module RSpreedly
         :on_trial,     :ready_to_renew,             :recurring,
         :store_credit, :store_credit_currency_code, :subscription_plan_name,
         :token,        :updated_at,                 :ready_to_renew_since,
-        :invoices
+        :invoices,     :transactions
       ]
 
       opts[:exclude] ||= []
